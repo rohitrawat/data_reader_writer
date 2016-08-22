@@ -57,6 +57,31 @@ void TextFile::beginReading() {
     printf("Header: %d\n", header);
     printf("Delimiter: '%c'\n", delim);
     printf("Size: %ld\n", sizeBytes);
+    if (header == 1) {
+        printf("Rewinding..\n");
+        rewind(fp);
+        string col = "";
+        while (!feof(fp)) {
+            read = fscanf(fp, "%c", &c);
+            if (read == 0) {
+                break;
+            }
+            if (c == delim || c == '\t') {
+                if(col.length()==0) {
+                    continue; // ignore repeated delimiters
+                }
+                colnames.push_back(col);
+                //cout<<col<<",";
+                col.clear();
+                continue;
+            }
+            if (c == '\n') {
+                colnames.push_back(col);
+                break;
+            }
+            col.push_back(c);
+        }
+    }
     if (header == 0) {
         printf("Rewinding..\n");
         rewind(fp);
@@ -88,6 +113,7 @@ void TextFile::endWriting() {
     // nothing to do
     state = CLOSED;
     fclose(fp);
+    fp = NULL; // fix double free corruption
 }
 
 int TextFile::getNextPattern(Array &arr) {
@@ -184,4 +210,15 @@ TextFile::~TextFile() {
     DESTRUCTOR_MSG("TextFile");
     if (fp != NULL)
         fclose(fp);
+}
+
+string TextFile::getColName(int i) {
+    if(colnames.size()==0) {
+        return "V"+i;
+    }
+    return colnames[i];
+}
+
+const vector<string>& TextFile::getAllColNames() {
+    return colnames;
 }

@@ -84,11 +84,12 @@ class TextFile : public File {
     
     char delim;
     int n;
-    int sizeBytes;
+    long sizeBytes;
     long tenPercentBytes;
     int tenPercentCount;
     char writeFormat[10];
     int labelFirst;
+    vector<string> colnames;
 
 public:
     TextFile(string fname, int N, int M, int isClassification, int fresh = 0, char* writeFormat = NULL, int hasOutputs = 1, int labelFirst = 0);
@@ -101,6 +102,9 @@ public:
     void beginReading();
     int getNextPattern(Array &arr);
     void endReading();
+    
+    string getColName(int i);
+    const vector<string>& getAllColNames();
 };
 
 class BinaryFile : public File {
