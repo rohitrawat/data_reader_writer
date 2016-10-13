@@ -24,6 +24,15 @@
 
 #include "types.h"
 
+using namespace std;
+
+//#define DEBUG_PRE_PROCESS
+#ifdef DEBUG_PRE_PROCESS 
+#define D(x) x
+#else 
+#define D(x)
+#endif
+
 #define CONSTRUCTOR_MSG(className) //cout<<"Constructing "<<className<<" object."<<endl;
 #define DESTRUCTOR_MSG(className) //cout<<"Destructing "<<className<<" object."<<endl;
 
@@ -34,6 +43,7 @@ enum file_type {
 class File {
 protected:
     int N, M, isClassification;
+    int patternSize;
     int Nv;
     int hasOutputs;
 
@@ -43,7 +53,15 @@ protected:
 public:
 
     File(int N1, int M1, int isClassification1, int hasOutputs1 = 1) : N(N1), M(M1), isClassification(isClassification1), hasOutputs(hasOutputs1) {
+        if(N<1) {
+            std::cout<<"File("<<N<<","<<M<<","<<isClassification1<<","<<hasOutputs<<") failed."<<std::endl;
+            exit(0);
+        }
         state = CLOSED;
+        if (isClassification)
+            patternSize =  N + 1;
+        else
+            patternSize =  N + M;
     }
 
     ~File() {
@@ -66,11 +84,8 @@ public:
         return M;
     }
 
-    int getPatternSize() {
-        if (isClassification)
-            return N + 1;
-        else
-            return N + M;
+    int getPatternSize() const {
+        return patternSize;
     }
 
     int getIsClassification() const {
@@ -84,7 +99,7 @@ class TextFile : public File {
 
     char delim;
     int n;
-    long sizeBytes;
+    unsigned long int sizeBytes;
     long tenPercentBytes;
     int tenPercentCount;
     char writeFormat[10];
@@ -112,7 +127,7 @@ public:
 class BinaryFile : public File {
     string fileName;
     FILE *fp;
-    vector<double> data;
+    vector<REAL> data;
     unsigned long int counter;
     int pattern_size;
 
@@ -128,10 +143,15 @@ public:
     void beginReading();
     int getNextPattern(Array &arr);
     void endReading();
+    
+    void truncate();
+    void truncate(int N, int M, int isClassification);
+    
+    void dump(string dumpName);
 };
 
 class MemoryFile : public File {
-    vector<double> data;
+    vector<REAL> data;
     unsigned long int counter;
     int pattern_size;
 
@@ -153,10 +173,16 @@ public:
 class FileStats {
     Array inputMeans;
     Array inputStd;
+    Array outputMeans;
+    Array outputStd;
     Array originalInputMeans;
     Array originalInputStd;
+    Array originalOutputMeans;
+    Array originalOutputStd;
     Array distanceMeasure;
     int N, M, Nv, isClassification;
+    int Nvv;
+    vector<int> classCounts;
 public:
     FileStats(const File &file);
     void beginWriting();
@@ -165,22 +191,30 @@ public:
 
     const Array& getInputMeans() const;
     const Array& getInputStd() const;
+    const Array& getOutputMeans() const;
+    const Array& getOutputStd() const;
     const Array& getOriginalInputMeans() const;
     const Array& getOriginalInputStd() const;
+    const Array& getOriginalOutputMeans() const;
+    const Array& getOriginalOutputStd() const;
     const Array& getDistanceMeasure() const;
 
     void setInputMeans(const Array &arr);
     void setInputStd(const Array &arr);
-    void setZeroMeanUnitStd();
     void setInputVar(const Array &arr);
     void setDistanceMeasure(const Array &arr);
+    void setOriginalInputMeans(const Array &arr);
+    void setOriginalInputStd(const Array &arr);
 
     int getNv();
     void print();
-
+    
     void addRandomProbes(int numProbes);
-
+    
     void reOrder(vector<int> order_fn);
+
+    void setNvv(int Nvv);
+    int getNvv();
 };
 
 #endif	/* FILE_IO_H */

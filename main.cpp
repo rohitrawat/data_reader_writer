@@ -132,7 +132,7 @@ FileStats preProcessFiles(string trainingFileName, string validationFileName, in
     cout << "Stats of validation file after pre-processing:\n";
     valStats.print();
 
-    trgStats.setZeroMeanUnitStd();
+    // trgStats.setZeroMeanUnitStd();
 
     return trgStats;
 }

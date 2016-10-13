@@ -136,13 +136,13 @@ void BinaryFile::init() {
 
 void BinaryFile::beginReading() {
     assert(fp != NULL);
-    fseek(fp, 0L, ios::beg);
+    fseek(fp, 0L, std::ios::beg);
     state = READING;
 }
 
 void BinaryFile::beginWriting() {
     assert(fp != NULL);
-    fseek(fp, 0L, ios::end);
+    fseek(fp, 0L, std::ios::end);
     state = WRITING;
 }
 

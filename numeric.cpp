@@ -3,6 +3,8 @@
 
 #define EPSILON 1e-12
 
+#define min(a, b) (a<=b?a:b)
+
 void AddArray(Array &a, Array &b, Array &c) {
     //assert(a.size() == b.size());
     int N = min(a.size(), b.size());
