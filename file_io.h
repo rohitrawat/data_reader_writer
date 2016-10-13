@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   file_io.h
  * Author: rohit
  *
@@ -81,7 +81,7 @@ public:
 class TextFile : public File {
     string fileName;
     FILE *fp;
-    
+
     char delim;
     int n;
     long sizeBytes;
@@ -102,9 +102,11 @@ public:
     void beginReading();
     int getNextPattern(Array &arr);
     void endReading();
-    
+
     string getColName(int i);
     const vector<string>& getAllColNames();
+
+    void setLabelFirst();
 };
 
 class BinaryFile : public File {
@@ -175,9 +177,9 @@ public:
 
     int getNv();
     void print();
-    
+
     void addRandomProbes(int numProbes);
-    
+
     void reOrder(vector<int> order_fn);
 };
 

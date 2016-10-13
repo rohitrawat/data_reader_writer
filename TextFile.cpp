@@ -223,3 +223,7 @@ string TextFile::getColName(int i) {
 const vector<string>& TextFile::getAllColNames() {
     return colnames;
 }
+
+void TextFile::setLabelFirst() {
+    labelFirst = 1;
+}

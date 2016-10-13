@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   main.cpp
  * Author: rohit
  *
@@ -108,7 +108,7 @@ FileStats preProcess(File &sourceFile, File &destFile, FileStats &sourceFileStat
 }
 
 
-FileStats preProcessFiles(string trainingFileName, string validationFileName, int N, int M, int isClassification, BinaryFile &preprocessedTrainingFile, BinaryFile &preprocessedValidationFile) {
+FileStats preProcessFiles(string trainingFileName, string validationFileName, int N, int M, int isClassification, BinaryFile &preprocessedTrainingFile, BinaryFile &preprocessedValidationFile, int labelFirst) {
     cout << "Training file: " << trainingFileName << endl;
     cout << "Validation file: " << validationFileName << endl;
     cout << "Type: " << (isClassification ? "Classification" : "Regression") << " type" << endl;
@@ -116,6 +116,11 @@ FileStats preProcessFiles(string trainingFileName, string validationFileName, in
 
     TextFile trainingFile(trainingFileName, N, M, isClassification);
     TextFile validationFile(validationFileName, N, M, isClassification);
+
+    if(labelFirst) {
+      trainingFile.setLabelFirst();
+      validationFile.setLabelFirst();
+    }
 
     cout << "Processing training file..\r\n";
     FileStats trgStats = preProcess(trainingFile, preprocessedTrainingFile);
@@ -128,7 +133,7 @@ FileStats preProcessFiles(string trainingFileName, string validationFileName, in
     valStats.print();
 
     trgStats.setZeroMeanUnitStd();
-    
+
     return trgStats;
 }
 
@@ -167,45 +172,32 @@ void splitTrainingValidation(string sourceFileName, string trainingFileName, str
     cout << "N = " << N << ", M = " << M << endl;
 
     enum {existing_file, new_file};
-    int hasOutputs = 1;
-    TextFile sourceFile(sourceFileName, N, M, isClassification, existing_file, "%f", hasOutputs, labelFirst);
+    TextFile sourceFile(sourceFileName, N, M, isClassification, existing_file);
     TextFile trainingFile(trainingFileName, N, M, isClassification, new_file);
     TextFile validationFile(validationFileName, N, M, isClassification, new_file);
-    
+
     splitTrainingValidation(sourceFile, trainingFile, validationFile, ratio);
 }
 
 
 /*
- * 
+ *
  */
 int main(int argc, char** argv) {
-//    char fnameTrg[] = "C:\\Users\\rohit\\Dropbox\\bluemix\\R_practice\\train.csv";
-//    char fnameTst[] = "C:\\Users\\rohit\\Dropbox\\bluemix\\R_practice\\test.csv";
-//    int N = 784;
-//    int M = 10;
-//    int isClassification = 1;
-//    int hasOutputs = 0;
-//    
-//    splitTrainingValidation(fnameTrg, "train.tsv", "val.tsv", N, M, isClassification, 0.7, 1);
-//    cout<<"done"<<endl;
-//    exit(0);
-    
-    char fnameTrg[] = "C:\\Users\\rohit\\Dropbox\\bluemix\\Twod.tra";
-    char fnameTst[] = "C:\\Users\\rohit\\Dropbox\\bluemix\\Twod.tst";
-    int N=8;
-    int M=7;
-    int isClassification = 0;
-    int hasOutputs = 1;
-    
-    splitTrainingValidation(fnameTrg, "train0.tsv", "val0.tsv", N, M, isClassification);
+    char fnameTrg[] = "data/mnist100.tra";
+    char fnameTst[] = "data/mnist100.tst";
+    int N=784;
+    int M=10;
+    int isClassification = 1;
+    int labelFirst = 1;
+    float ratio = 0.7;
+
+    splitTrainingValidation(fnameTrg, "train0.tsv", "val0.tsv", N, M, isClassification, ratio, labelFirst);
     cout<<"done"<<endl;
     exit(0);
 
     BinaryFile preprocessedTrainingFile(N, M, isClassification), preprocessedValidationFile(N, M, isClassification);
-    FileStats trgStats = preProcessFiles(fnameTrg, fnameTst, N, M, isClassification, preprocessedTrainingFile, preprocessedValidationFile);
-//    FileStats trgStats = preProcessFiles(fnameTrg, fnameTst, N, M, isClassification, preprocessedTrainingFile, preprocessedValidationFile, hasOutputs);
-    
+    FileStats trgStats = preProcessFiles("train0.tsv", "val0.tsv", N, M, isClassification, preprocessedTrainingFile, preprocessedValidationFile, labelFirst);
+
     return 0;
 }
-
