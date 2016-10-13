@@ -15,8 +15,9 @@ TextFile::TextFile(string fname1, int N1, int M1, int isClassification1, int fre
         state = WRITING;
     }
     if (fp == NULL) {
-        printf("TextFile: fopen() failed.");
+        printf("TextFile: fopen() failed.\n");
         perror(fileName.c_str());
+        printf("\n");
         exit(0);
     }
     delim = ' ';
@@ -47,7 +48,7 @@ void TextFile::beginReading() {
         if (c == '\n') {
             break;
         }
-        if (isalpha(c)) {
+        if (isalpha(c) && c!='e' && c!='E') {
             header = 1;
         }
         if (c == ',') {

@@ -5,8 +5,8 @@ FileStats::FileStats(const File &file) {
     N = file.getN();
     M = file.getM();
     isClassification = file.getIsClassification();
-    inputMeans.resize(N); // note: resize automatically sets data to zeros
-    inputStd.resize(N, 1.0);
+    inputMeans.resize(N, 0.0); // note: resize automatically sets data to zeros
+    inputStd.resize(N, 0.0);    // must be set to 0  as it is accumulated
     originalInputMeans.resize(N); // this will store the files input mean and std which was used to normalize it
     originalInputStd.resize(N, 1.0);
     distanceMeasure.resize(N, 1.0);
