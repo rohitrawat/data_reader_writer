@@ -123,9 +123,10 @@ int TextFile::getNextPattern(Array &arr) {
     if (fp == NULL || feof(fp)) {
         return 0;
     }
+    
+    double temp;
 
     if (labelFirst && isClassification) {
-        double temp;
         if (delim == ',') {
             read = fscanf(fp, "%lf,", &temp);
         } else {
@@ -135,7 +136,7 @@ int TextFile::getNextPattern(Array &arr) {
             return 0;
         }
         arr[N] = (REAL) ((int) temp);
-        if (temp < 0 || temp > M) {
+        if (temp < 0 || temp > M) { // should be strictly <1 || >M, but currently relaxed
             cout << "Invalid class ID: " << temp << endl;
             exit(0);
         }
@@ -143,9 +144,11 @@ int TextFile::getNextPattern(Array &arr) {
 
     for (int i = 0; i < N; i++) {
         if (delim == ',') {
-            read = fscanf(fp, "%lf,", &arr[i]);
+            read = fscanf(fp, "%lf,", &temp);
+            arr[i] = temp;
         } else {
-            read = fscanf(fp, "%lf", &arr[i]);
+            read = fscanf(fp, "%lf", &temp);
+            arr[i] = temp;
         }
         if (read != 1) {
             return 0;
@@ -166,9 +169,11 @@ int TextFile::getNextPattern(Array &arr) {
         } else {
             for (int i = 0; i < M; i++) {
                 if (delim == ',') {
-                    read = fscanf(fp, "%lf,", &arr[N + i]);
+                    read = fscanf(fp, "%lf,", &temp);
+                    arr[N + i] = temp;
                 } else {
-                    read = fscanf(fp, "%lf", &arr[N + i]);
+                    read = fscanf(fp, "%lf", &temp);
+                    arr[N + i] = temp;
                 }
                 if (read != 1) {
                     return 0;
