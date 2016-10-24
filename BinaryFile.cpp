@@ -1,5 +1,7 @@
 #include "file_io.h"
 
+using namespace std;
+
 #if 0
 
 #include <vector>
@@ -116,17 +118,21 @@ void BinaryFile::init() {
 
     // Open a transient binary file
 #ifdef unix
-//    string template = path_to_temp + "PlnTmpXXXXXX";
-//    fp = mkstemp(template);
-    char *tempnam_result = tempnam(path_to_temp.c_str(), "PlnTmp");
+    string templatestr = path_to_temp + "/PlnTmpXXXXXX";
+    
+    char *templatechr = new char[templatestr.length()+8];
+    strcpy(templatechr, templatestr.c_str());
+    int fdescriptor = mkstemp(templatechr);
+    fp = fdopen(fdescriptor, "wb+");
+    fileName = string(templatechr);
 #else
     char *tempnam_result = _tempnam(path_to_temp.c_str(), "PlnTmp");
-#endif
     fileName = string(tempnam_result);
     if (tempnam_result) // fixed a leak detected by valgrind
         free(tempnam_result);
-
     fp = fopen(fileName.c_str(), "wb+");
+#endif
+
     if (fp == NULL) {
         perror(fileName.c_str());
         exit(0);
@@ -136,13 +142,13 @@ void BinaryFile::init() {
 
 void BinaryFile::beginReading() {
     assert(fp != NULL);
-    fseek(fp, 0L, std::ios::beg);
+    fseek(fp, 0L, ios::beg);
     state = READING;
 }
 
 void BinaryFile::beginWriting() {
     assert(fp != NULL);
-    fseek(fp, 0L, std::ios::end);
+    fseek(fp, 0L, ios::end);
     state = WRITING;
 }
 
@@ -202,6 +208,42 @@ BinaryFile::~BinaryFile() {
     if (remove(fileName.c_str()) != 0) {
         perror(fileName.c_str());
     }
+}
+
+void BinaryFile::truncate() {
+    fp = freopen(NULL, "wb+", fp);
+    state = WRITING;
+    if (fp == NULL) {
+        perror(fileName.c_str());
+        exit(0);
+    }
+}
+
+void BinaryFile::truncate(int N1, int M1, int isClassification1) {
+    truncate();
+    
+    N = N1;
+    M = M1;
+    isClassification = isClassification1;
+    
+    if (isClassification)
+        patternSize =  N + 1;
+    else
+        patternSize =  N + M;
+}
+
+void BinaryFile::dump(string dumpName) {
+    Array pattern;
+    pattern.resize(getPatternSize());
+    beginReading();
+    
+    TextFile out(dumpName, N, M, isClassification, 1);
+    out.beginWriting();
+    while(getNextPattern(pattern)) {
+        out.putPattern(pattern);
+    }
+    out.endWriting();
+    endReading();
 }
 
 #endif
