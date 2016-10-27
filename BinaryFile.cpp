@@ -1,4 +1,5 @@
 #include "file_io.h"
+#include <string.h>
 
 using namespace std;
 

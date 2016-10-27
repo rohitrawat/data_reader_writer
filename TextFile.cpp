@@ -1,4 +1,5 @@
 #include "file_io.h"
+using namespace std;
 
 #include <string.h>
 
@@ -126,7 +127,7 @@ int TextFile::getNextPattern(Array &arr) {
     
     double temp;
 
-    if (labelFirst && isClassification) {
+    if (hasOutputs && labelFirst && isClassification) { // todo: reg files with y first
         if (delim == ',') {
             read = fscanf(fp, "%lf,", &temp);
         } else {
@@ -145,14 +146,13 @@ int TextFile::getNextPattern(Array &arr) {
     for (int i = 0; i < N; i++) {
         if (delim == ',') {
             read = fscanf(fp, "%lf,", &temp);
-            arr[i] = temp;
         } else {
             read = fscanf(fp, "%lf", &temp);
-            arr[i] = temp;
         }
         if (read != 1) {
             return 0;
         }
+        arr[i] = temp;
     }
 
     if (hasOutputs && labelFirst == 0) {
@@ -170,14 +170,13 @@ int TextFile::getNextPattern(Array &arr) {
             for (int i = 0; i < M; i++) {
                 if (delim == ',') {
                     read = fscanf(fp, "%lf,", &temp);
-                    arr[N + i] = temp;
                 } else {
                     read = fscanf(fp, "%lf", &temp);
-                    arr[N + i] = temp;
                 }
                 if (read != 1) {
                     return 0;
                 }
+                arr[N + i] = temp;
             }
         }
     }

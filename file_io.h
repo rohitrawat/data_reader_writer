@@ -46,13 +46,14 @@ protected:
     int patternSize;
     int Nv;
     int hasOutputs;
+    string label;
 
     enum {
         CLOSED, READING, WRITING
     } state;
 public:
 
-    File(int N1, int M1, int isClassification1, int hasOutputs1 = 1) : N(N1), M(M1), isClassification(isClassification1), hasOutputs(hasOutputs1) {
+    File(int N1, int M1, int isClassification1, int hasOutputs1 = 1, string label1 = "File") : N(N1), M(M1), isClassification(isClassification1), hasOutputs(hasOutputs1), label(label1) {
         if(N<1) {
             std::cout<<"File("<<N<<","<<M<<","<<isClassification1<<","<<hasOutputs<<") failed."<<std::endl;
             exit(0);
@@ -90,6 +91,14 @@ public:
 
     int getIsClassification() const {
         return isClassification;
+    }
+    
+    string getLabel() {
+        return label;
+    }
+    
+    void setLabel(string l) {
+        label = l;
     }
 };
 
@@ -216,5 +225,21 @@ public:
     void setNvv(int Nvv);
     int getNvv();
 };
+
+// -------------------------------------------------------------------------- //
+// file_utils.cpp
+// -------------------------------------------------------------------------- //
+
+// compute file stats
+FileStats computeStats(File &sourceFile);
+FileStats preProcess(File &sourceFile, File &destFile, int disableNormalization);
+FileStats preProcess(File &sourceFile, File &destFile, FileStats &sourceFileStats);
+FileStats preProcessFiles(string trainingFileName, string validationFileName, int N, int M, int isClassification, BinaryFile &preprocessedTrainingFile, BinaryFile &preprocessedValidationFile, int disableNormalization);
+void check_file_health(File & file);
+void dump(File &file, string dumpName);
+int saveSelectedFeatures(File &infile, File &outfile, vector<int> input_columns_list);
+
+
+
 
 #endif	/* FILE_IO_H */

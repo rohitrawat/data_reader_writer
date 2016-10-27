@@ -167,7 +167,7 @@ void FileStats::endWriting() {
         for(int i=0; i<M; i++) {
             if(double(classCounts[i])/Nv<0.2/M) {
                 cout<<"Class "<<i+1<<" has too few patterns = "<<classCounts[i]<<" ("<<double(classCounts[i])*100.0/Nv<<"%). Cannot continue.\n";
-                exit(0);
+                //exit(0);
             }
         }
     }
